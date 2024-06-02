@@ -3,3 +3,9 @@ version: '${project.version}'
 description: Automatically replants crops when harvested with specific tools.
 main: me.niko302.autoreplant.Autoreplant
 api-version: '1.20'
+
+commands:
+  autoreplant:
+    description: Toggle autoreplant feature
+    usage: /autoreplant
+    permission: autoreplant.use

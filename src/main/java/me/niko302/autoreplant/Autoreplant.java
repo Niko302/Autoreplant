@@ -1,58 +1,125 @@
 package me.niko302.autoreplant;
 
+import me.niko302.autoreplant.commands.Commands;
 import me.niko302.autoreplant.config.ConfigManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public final class Autoreplant extends JavaPlugin implements Listener {
 
     private ConfigManager configManager;
+    private List<UUID> enabledPlayers;
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
         getServer().getPluginManager().registerEvents(this, this);
         configManager = new ConfigManager(this);
-        System.out.println("Autoreplant has started successfully.");
+        enabledPlayers = new ArrayList<>();
+        getCommand("autoreplant").setExecutor(new Commands(this)); // Registering the command executor
+        getLogger().info("Autoreplant has started successfully.");
+
+        // Load autoreplant state from data.yml
+        loadPlayerStates();
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
-        System.out.println("Autoreplant has stopped.");
+        // Save all enabled player states to data.yml
+        savePlayerStates();
+
+        getLogger().info("Autoreplant has stopped.");
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
         Block block = event.getBlock();
         Material blockType = block.getType();
-        Material toolMaterial = event.getPlayer().getInventory().getItemInMainHand().getType();
+        Material toolMaterial = player.getInventory().getItemInMainHand().getType();
+
+        if (!isAutoreplantEnabled(player) || !player.hasPermission("autoreplant.use")) {
+            return;
+        }
 
         if (isFullyGrownCrop(block) && configManager.getAllowedItems().contains(toolMaterial)) {
-            event.setCancelled(true); // Prevent the block from being broken
+            event.setCancelled(true);
 
-            // Replant the crop
             block.setBlockData(getInitialCropBlockData(blockType));
 
-            // Drop the harvested items
-            for (ItemStack drop : getCropDrops(blockType, event.getPlayer().getInventory().getItemInMainHand(), configManager.useFortune())) {
+            for (ItemStack drop : getCropDrops(blockType, player.getInventory().getItemInMainHand(), configManager.useFortune())) {
                 block.getWorld().dropItem(block.getLocation(), drop);
             }
         }
     }
 
+    public boolean isAutoreplantEnabled(Player player) {
+        return enabledPlayers.contains(player.getUniqueId());
+    }
+
+    public void setAutoreplantEnabled(Player player, boolean enabled) {
+        if (enabled) {
+            enabledPlayers.add(player.getUniqueId());
+        } else {
+            enabledPlayers.remove(player.getUniqueId());
+        }
+
+        // Save the state to data.yml
+        savePlayerState(player.getUniqueId(), enabled);
+    }
+
+    private void savePlayerState(UUID playerId, boolean enabled) {
+        File dataFile = new File(getDataFolder(), "data.yml");
+        YamlConfiguration dataConfig = YamlConfiguration.loadConfiguration(dataFile);
+        dataConfig.set(playerId.toString() + ".autoreplantEnabled", enabled);
+        try {
+            dataConfig.save(dataFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void savePlayerStates() {
+        File dataFile = new File(getDataFolder(), "data.yml");
+        YamlConfiguration dataConfig = YamlConfiguration.loadConfiguration(dataFile);
+        for (UUID playerId : enabledPlayers) {
+            dataConfig.set(playerId.toString() + ".autoreplantEnabled", true);
+        }
+        try {
+            dataConfig.save(dataFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadPlayerStates() {
+        File dataFile = new File(getDataFolder(), "data.yml");
+        if (dataFile.exists()) {
+            YamlConfiguration dataConfig = YamlConfiguration.loadConfiguration(dataFile);
+            for (String playerId : dataConfig.getKeys(false)) {
+                boolean enabled = dataConfig.getBoolean(playerId + ".autoreplantEnabled", false);
+                if (enabled) {
+                    enabledPlayers.add(UUID.fromString(playerId));
+                }
+            }
+        }
+    }
 
     private boolean isFullyGrownCrop(Block block) {
         BlockData blockData = block.getBlockData();
@@ -100,7 +167,6 @@ public final class Autoreplant extends JavaPlugin implements Listener {
         }
         return drops;
     }
-
 
     private int getBaseAmount(Material cropType) {
         // Define base drop amounts for different crop types

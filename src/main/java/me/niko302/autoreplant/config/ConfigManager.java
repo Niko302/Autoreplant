@@ -5,7 +5,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ConfigManager {
@@ -13,17 +12,8 @@ public class ConfigManager {
     private final JavaPlugin plugin;
     private FileConfiguration config;
 
-    private boolean shouldReplant;
-    private boolean useFortune; // New variable to store the use-fortune setting
-
-    // Define default materials here
-    private final List<Material> defaultAllowedItems = Arrays.asList(
-            Material.WOODEN_PICKAXE,
-            Material.STONE_PICKAXE,
-            Material.IRON_PICKAXE,
-            Material.GOLDEN_PICKAXE,
-            Material.DIAMOND_HOE
-    );
+    private boolean useFortune; // Variable to store the use-fortune setting
+    private boolean autoreplantEnabled; // Variable to store the autoreplant status
 
     public ConfigManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -35,18 +25,11 @@ public class ConfigManager {
         plugin.reloadConfig();
         config = plugin.getConfig();
 
-        // Check if allowed-items list is empty, then populate it with defaults
-        if (config.getStringList("allowed-items").isEmpty()) {
-            List<String> defaultItemNames = new ArrayList<>();
-            for (Material material : defaultAllowedItems) {
-                defaultItemNames.add(material.name());
-            }
-            config.set("allowed-items", defaultItemNames);
-            plugin.saveConfig();
-        }
-
         // Load use-fortune setting
         useFortune = config.getBoolean("use-fortune", true);
+
+        // Load autoreplant setting
+        autoreplantEnabled = config.getBoolean("autoreplant-enabled", true);
     }
 
     public List<Material> getAllowedItems() {
@@ -65,5 +48,9 @@ public class ConfigManager {
 
     public boolean useFortune() {
         return useFortune;
+    }
+
+    public boolean isAutoreplantEnabled() {
+        return autoreplantEnabled;
     }
 }
