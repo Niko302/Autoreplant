@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -91,7 +92,6 @@ public final class Autoreplant extends JavaPlugin implements Listener {
     }
 
 
-
     public boolean isAutoreplantEnabled(Player player) {
         return enabledPlayers.contains(player.getUniqueId());
     }
@@ -165,31 +165,38 @@ public final class Autoreplant extends JavaPlugin implements Listener {
         List<ItemStack> drops = new ArrayList<>();
         int baseAmount = getBaseAmount(cropType);
         int fortuneLevel = useFortune ? getFortuneLevel(tool) : 0; // Only consider Fortune if enabled in config
-        int dropAmount = baseAmount + new Random().nextInt(fortuneLevel + 1);
+        int dropAmount = baseAmount;
         switch (cropType) {
             case WHEAT:
+                dropAmount += new Random().nextInt(3) + 1;
                 drops.add(new ItemStack(Material.WHEAT, dropAmount));
                 drops.add(new ItemStack(Material.WHEAT_SEEDS, dropAmount));
                 break;
             case CARROTS:
+                dropAmount += new Random().nextInt(3) + 1;
                 drops.add(new ItemStack(Material.CARROT, dropAmount));
                 break;
             case POTATOES:
+                dropAmount += new Random().nextInt(3) + 1;
                 drops.add(new ItemStack(Material.POTATO, dropAmount));
                 break;
             case BEETROOTS:
+                dropAmount += new Random().nextInt(3) + 1;
                 drops.add(new ItemStack(Material.BEETROOT, dropAmount));
                 drops.add(new ItemStack(Material.BEETROOT_SEEDS, dropAmount));
                 break;
             case COCOA:
+                dropAmount += new Random().nextInt(2) + 2;
                 drops.add(new ItemStack(Material.COCOA_BEANS, dropAmount));
                 break;
             case NETHER_WART:
+                dropAmount += new Random().nextInt(2) + 2;
                 drops.add(new ItemStack(Material.NETHER_WART, dropAmount));
                 break;
         }
         return drops;
     }
+
 
     private int getBaseAmount(Material cropType) {
         // Define base drop amounts for different crop types
@@ -209,9 +216,65 @@ public final class Autoreplant extends JavaPlugin implements Listener {
     }
 
     private int getFortuneLevel(ItemStack tool) {
-        if (tool != null && tool.hasItemMeta() && tool.getItemMeta().hasEnchant(Enchantment.FORTUNE)) {
-            return tool.getItemMeta().getEnchantLevel(Enchantment.FORTUNE);
+        if (tool != null && tool.hasItemMeta()) {
+            ItemMeta meta = tool.getItemMeta();
+            if (meta.hasLore()) {
+                List<String> lore = meta.getLore();
+                for (String line : lore) {
+                    if (line.contains("Fortune")) {
+                        String[] parts = line.split(" ");
+                        for (String part : parts) {
+                            if (part.matches("[IVXLCDM]+")) {
+                                // Convert Roman numeral to integer
+                                return romanToInteger(part);
+                            }
+                        }
+                    }
+                }
+            }
         }
         return 0;
+    }
+
+    // Method to convert Roman numerals to integer
+    private int romanToInteger(String roman) {
+        int result = 0;
+        for (int i = 0; i < roman.length(); i++) {
+            char currentChar = roman.charAt(i);
+            int currentValue = romanCharToInt(currentChar);
+            if (i + 1 < roman.length()) {
+                int nextValue = romanCharToInt(roman.charAt(i + 1));
+                if (currentValue < nextValue) {
+                    result -= currentValue;
+                } else {
+                    result += currentValue;
+                }
+            } else {
+                result += currentValue;
+            }
+        }
+        return result;
+    }
+
+    // Method to convert Roman numerals to integer values
+    private int romanCharToInt(char c) {
+        switch (c) {
+            case 'I':
+                return 1;
+            case 'V':
+                return 5;
+            case 'X':
+                return 10;
+            case 'L':
+                return 50;
+            case 'C':
+                return 100;
+            case 'D':
+                return 500;
+            case 'M':
+                return 1000;
+            default:
+                return 0;
+        }
     }
 }

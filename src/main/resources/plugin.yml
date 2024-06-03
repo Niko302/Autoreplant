@@ -10,7 +10,6 @@ commands:
     usage: /autoreplant
     permission: autoreplant.use
   permissions:
-    autoreplant.ignore:
+    autoreplant.ignore.tool:
       description: 'Give access to ignore tools'
       default: op
-      permission: autoreplant.ignore.tool
