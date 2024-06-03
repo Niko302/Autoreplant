@@ -58,16 +58,39 @@ public final class Autoreplant extends JavaPlugin implements Listener {
             return;
         }
 
-        if (isFullyGrownCrop(block) && configManager.getAllowedItems().contains(toolMaterial)) {
-            event.setCancelled(true);
+        // Check if the player has the permission to ignore tool restrictions
+        boolean ignoreToolRestrictions = player.hasPermission("autoreplant.ignore.tool");
 
-            block.setBlockData(getInitialCropBlockData(blockType));
+        // Check if the block is a crop block
+        if (isCropBlock(block)) {
+            // Check if the block is fully grown and either the tool is allowed or tool restrictions are ignored
+            if (isFullyGrownCrop(block) && (configManager.getAllowedItems().contains(toolMaterial) || ignoreToolRestrictions)) {
+                event.setCancelled(true);
 
-            for (ItemStack drop : getCropDrops(blockType, player.getInventory().getItemInMainHand(), configManager.useFortune())) {
-                block.getWorld().dropItem(block.getLocation(), drop);
+                block.setBlockData(getInitialCropBlockData(blockType));
+
+                for (ItemStack drop : getCropDrops(blockType, player.getInventory().getItemInMainHand(), configManager.useFortune())) {
+                    block.getWorld().dropItem(block.getLocation(), drop);
+                }
+            } else {
+                // If the crop is not fully grown, cancel the event and restore the block to its original state
+                event.setCancelled(true);
+                block.getState().update(true, false);
             }
         }
     }
+
+    // Method to check if the block is a crop block
+    private boolean isCropBlock(Block block) {
+        return block.getType() == Material.WHEAT ||
+                block.getType() == Material.CARROTS ||
+                block.getType() == Material.POTATOES ||
+                block.getType() == Material.BEETROOTS ||
+                block.getType() == Material.COCOA ||
+                block.getType() == Material.NETHER_WART;
+    }
+
+
 
     public boolean isAutoreplantEnabled(Player player) {
         return enabledPlayers.contains(player.getUniqueId());
