@@ -34,14 +34,3 @@ Autoreplant is a Minecraft Bukkit/Spigot/Paper plugin designed to automatically 
 ## Configuration
 
 No configuration is necessary out of the box, but ensure players have the appropriate permissions set up.
-
-## Development
-
-### Prerequisites
-
-- Java Development Kit (JDK) 8 or higher
-- Maven
-
-### Building from Source
-
-1. Clone the repository:
