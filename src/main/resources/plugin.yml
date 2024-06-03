@@ -6,6 +6,11 @@ api-version: '1.20'
 
 commands:
   autoreplant:
-    description: Toggle autoreplant feature
+    description: 'Toggle autoreplant feature'
     usage: /autoreplant
     permission: autoreplant.use
+  permissions:
+    autoreplant.ignore:
+      description: 'Give access to ignore tools'
+      default: op
+      permission: autoreplant.ignore.tool
