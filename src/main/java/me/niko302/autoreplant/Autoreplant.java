@@ -27,6 +27,7 @@ public final class Autoreplant extends JavaPlugin implements Listener {
 
     private ConfigManager configManager;
     private List<UUID> enabledPlayers;
+    private boolean ignoreToolRestrictions;
 
     @Override
     public void onEnable() {
@@ -59,8 +60,15 @@ public final class Autoreplant extends JavaPlugin implements Listener {
             return;
         }
 
-        // Check if the player has the permission to ignore tool restrictions
-        boolean ignoreToolRestrictions = player.hasPermission("autoreplant.ignore.tool");
+        // Check if the block was actually broken
+        if (block.getType() != blockType) {
+            return; // Block wasn't actually broken, so don't execute autoreplant logic
+        }
+
+        // Check if the event was cancelled by a protection plugin
+        if (event.isCancelled()) {
+            return; // Event was cancelled, so don't execute autoreplant logic
+        }
 
         // Check if the block is a crop block
         if (isCropBlock(block)) {
@@ -80,6 +88,7 @@ public final class Autoreplant extends JavaPlugin implements Listener {
             }
         }
     }
+
 
     // Method to check if the block is a crop block
     private boolean isCropBlock(Block block) {
