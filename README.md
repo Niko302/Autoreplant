@@ -7,7 +7,7 @@ Autoreplant is a Minecraft Bukkit/Spigot/Paper plugin designed to automatically 
 ## Features
 
 - Automatically replants crops when harvested.
-- Supports a variety of crops: Wheat, Carrots, Potatoes, Beetroots, Cocoa Beans, Nether Wart, Sugar Cane, and Pumpkins (which drop as carved pumpkins when sheared).
+- Supports a variety of crops: Wheat, Carrots, Potatoes, Beetroots, Cocoa Beans, Nether Wart.
 - Allows usage of different tools and applies Fortune enchantment effects when configured.
 - Toggle functionality for individual players using the `/autoreplant` command.
 
