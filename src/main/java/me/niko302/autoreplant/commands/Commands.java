@@ -1,7 +1,10 @@
 // Commands.java
 package me.niko302.autoreplant.commands;
-
 import me.niko302.autoreplant.Autoreplant;
+
+
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -25,16 +28,29 @@ public class Commands implements CommandExecutor {
         Player player = (Player) sender;
 
         if (!player.hasPermission("autoreplant.use")) {
-            player.sendMessage("You don't have permission to use this command!");
+            TextComponent noPermissionMessage = new TextComponent("You don't have permission to use this command!");
+            noPermissionMessage.setColor(ChatColor.of(new java.awt.Color(139, 0, 0))); // Dark red color
+            player.spigot().sendMessage(noPermissionMessage);
             return true;
         }
 
         if (args.length == 0) {
             boolean newStatus = !plugin.isAutoreplantEnabled(player);
             plugin.setAutoreplantEnabled(player, newStatus);
-            player.sendMessage("Autoreplant is now " + (newStatus ? "enabled" : "disabled"));
+            TextComponent statusMessage = new TextComponent("Autoreplant is now ");
+            if (newStatus) {
+                TextComponent enabledMessage = new TextComponent("enabled");
+                enabledMessage.setColor(ChatColor.of(new java.awt.Color(0, 255, 0))); // Green color
+                statusMessage.addExtra(enabledMessage);
+            } else {
+                TextComponent disabledMessage = new TextComponent("disabled");
+                disabledMessage.setColor(ChatColor.of(new java.awt.Color(255, 0, 0))); // Red color
+                statusMessage.addExtra(disabledMessage);
+            }
+            player.spigot().sendMessage(statusMessage);
         } else {
-            player.sendMessage("Usage: /autoreplant");
+            TextComponent usageMessage = new TextComponent("Usage: /autoreplant");
+            player.spigot().sendMessage(usageMessage);
         }
 
         return true;
