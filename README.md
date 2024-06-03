@@ -28,7 +28,7 @@ Autoreplant is a Minecraft Bukkit/Spigot/Paper plugin designed to automatically 
 ## Installation
 
 1. Download the latest release of the plugin from the [Releases](https://github.com/Niko302/Autoreplant/releases) section.
-2. Place the `Autoreplant1.2.jar` file into your server's `plugins` directory.
+2. Place the `Autoreplant.jar` file into your server's `plugins` directory.
 3. Restart your server to load the plugin.
 
 ## Configuration
