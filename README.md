@@ -14,6 +14,7 @@ Autoreplant is a Minecraft Bukkit/Spigot/Paper plugin designed to automatically 
 ## Permissions
 
 - `autoreplant.use`: Allows the player to toggle the auto-replant feature on and off.
+- `autoreplant.ignore.tool`: Permission to ignore tool restrictions making it so you can replant with anything in hand.
 
 ## Commands
 
