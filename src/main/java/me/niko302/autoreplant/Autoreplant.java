@@ -57,7 +57,7 @@ public final class Autoreplant extends JavaPlugin implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         // Check if the event was cancelled by another plugin
         if (event.isCancelled()) {
-            getLogger().info("Block break event was cancelled by another plugin.");
+//            getLogger().info("Block break event was cancelled by another plugin.");
             return;
         }
 
@@ -67,7 +67,7 @@ public final class Autoreplant extends JavaPlugin implements Listener {
         ItemStack tool = player.getInventory().getItemInMainHand();
 
         // Add logging to check the player's tool
-        getLogger().info("Player's tool: " + tool.toString());
+//        getLogger().info("Player's tool: " + tool.toString());
 
         if (!isAutoreplantEnabled(player) || !player.hasPermission("autoreplant.use")) {
             return;
@@ -197,14 +197,14 @@ public final class Autoreplant extends JavaPlugin implements Listener {
     private List<ItemStack> getCropDrops(Material cropType, ItemStack tool, boolean useFortune) {
         List<ItemStack> drops = new ArrayList<>();
         int baseAmount = getBaseAmount(cropType);
-        getLogger().info("Base Amount: " + baseAmount);
+//        getLogger().info("Base Amount: " + baseAmount);
         int fortuneLevel = useFortune ? getFortuneLevel(tool) : 0; // Only consider Fortune if enabled in config
-        getLogger().info("Fortune Level: " + fortuneLevel);
+//        getLogger().info("Fortune Level: " + fortuneLevel);
         int dropAmount = baseAmount;
 
         // Adjust drop amount based on Fortune level
         dropAmount += fortuneLevel;
-        getLogger().info("Drop Amount: " + dropAmount);
+//        getLogger().info("Drop Amount: " + dropAmount);
 
         switch (cropType) {
             case WHEAT:
@@ -229,7 +229,7 @@ public final class Autoreplant extends JavaPlugin implements Listener {
                 break;
         }
 
-        getLogger().info("Drops: " + drops.toString());
+//        getLogger().info("Drops: " + drops.toString());
         return drops;
     }
 
