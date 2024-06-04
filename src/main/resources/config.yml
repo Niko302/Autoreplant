@@ -1,5 +1,6 @@
 use-fortune: true
+ignore-tool-restrictions: false
 allowed-items:
-# FIND ITEM NAMES HERE: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+  # FIND ITEM NAMES HERE: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
   - DIAMOND_HOE
   - IRON_HOE

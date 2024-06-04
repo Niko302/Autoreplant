@@ -9,7 +9,11 @@ commands:
     description: 'Toggle autoreplant feature'
     usage: /autoreplant
     permission: autoreplant.use
-  permissions:
-    autoreplant.ignore.tool:
-      description: 'Give access to ignore tools'
-      default: op
+
+permissions:
+  autoreplant.use:
+    description: Allows use of the autoreplant command
+    default: op
+  autoreplant.ignoretoolrestrictions:
+    description: Allows ignoring tool restrictions for autoreplant
+    default: false

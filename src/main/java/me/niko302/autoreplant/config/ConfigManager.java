@@ -14,6 +14,7 @@ public class ConfigManager {
 
     private boolean useFortune; // Variable to store the use-fortune setting
     private boolean autoreplantEnabled; // Variable to store the autoreplant status
+    private boolean ignoreToolRestrictions; // Variable to store the ignore-tool-restrictions status
 
     public ConfigManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -30,6 +31,9 @@ public class ConfigManager {
 
         // Load autoreplant setting
         autoreplantEnabled = config.getBoolean("autoreplant-enabled", true);
+
+        // Load ignore-tool-restrictions setting
+        ignoreToolRestrictions = config.getBoolean("ignore-tool-restrictions", false);
     }
 
     public List<Material> getAllowedItems() {
@@ -52,5 +56,9 @@ public class ConfigManager {
 
     public boolean isAutoreplantEnabled() {
         return autoreplantEnabled;
+    }
+
+    public boolean getIgnoreToolRestrictions() {
+        return ignoreToolRestrictions;
     }
 }
