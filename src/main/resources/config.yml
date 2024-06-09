@@ -4,3 +4,12 @@ allowed-items:
   # FIND ITEM NAMES HERE: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
   - DIAMOND_HOE
   - IRON_HOE
+
+messages:
+  #COLOR CODES CAN BE FOUND https://htmlcolorcodes.com/
+  #Remember to replace the # with a &
+  #example: #76cf12 is written as &76cf12
+  enabled: "&808080Autoreplant is now &008000Enabled"
+  disabled: "&808080Autoreplant is now &FF0000Disabled"
+  usage: "Usage: /autoreplant"
+  no_permission: "&8B0000You don't have permission to use this command!"

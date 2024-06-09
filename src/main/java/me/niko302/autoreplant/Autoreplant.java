@@ -36,7 +36,12 @@ public final class Autoreplant extends JavaPlugin implements Listener {
         configManager = new ConfigManager(this);
         enabledPlayers = new ArrayList<>();
         getCommand("autoreplant").setExecutor(new Commands(this)); // Registering the command executor
+
+        int pluginId = 22206; // BSTATS logging player activity
+        Metrics metrics = new Metrics(this, pluginId);
+
         getLogger().info("Autoreplant has started successfully.");
+
 
         // Initialize the fortuneEnchantmentName field
         fortuneEnchantmentName = EnchantmentUtils.getFortuneEnchantmentName();

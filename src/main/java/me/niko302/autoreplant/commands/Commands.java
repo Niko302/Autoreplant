@@ -1,14 +1,14 @@
-// Commands.java
 package me.niko302.autoreplant.commands;
+
 import me.niko302.autoreplant.Autoreplant;
-
-
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.awt.Color;
 
 public class Commands implements CommandExecutor {
 
@@ -28,8 +28,7 @@ public class Commands implements CommandExecutor {
         Player player = (Player) sender;
 
         if (!player.hasPermission("autoreplant.use")) {
-            TextComponent noPermissionMessage = new TextComponent("You don't have permission to use this command!");
-            noPermissionMessage.setColor(ChatColor.of(new java.awt.Color(139, 0, 0))); // Dark red color
+            TextComponent noPermissionMessage = parseMessage(plugin.getConfig().getString("messages.no_permission"));
             player.spigot().sendMessage(noPermissionMessage);
             return true;
         }
@@ -37,22 +36,53 @@ public class Commands implements CommandExecutor {
         if (args.length == 0) {
             boolean newStatus = !plugin.isAutoreplantEnabled(player);
             plugin.setAutoreplantEnabled(player, newStatus);
-            TextComponent statusMessage = new TextComponent("Autoreplant is now ");
-            if (newStatus) {
-                TextComponent enabledMessage = new TextComponent("enabled");
-                enabledMessage.setColor(ChatColor.of(new java.awt.Color(0, 255, 0))); // Green color
-                statusMessage.addExtra(enabledMessage);
-            } else {
-                TextComponent disabledMessage = new TextComponent("disabled");
-                disabledMessage.setColor(ChatColor.of(new java.awt.Color(255, 0, 0))); // Red color
-                statusMessage.addExtra(disabledMessage);
-            }
+            String statusMessageText = plugin.getConfig().getString(newStatus ? "messages.enabled" : "messages.disabled");
+            TextComponent statusMessage = parseMessage(statusMessageText);
             player.spigot().sendMessage(statusMessage);
         } else {
-            TextComponent usageMessage = new TextComponent("Usage: /autoreplant");
+            TextComponent usageMessage = parseMessage(plugin.getConfig().getString("messages.usage"));
             player.spigot().sendMessage(usageMessage);
         }
 
         return true;
+    }
+
+    private TextComponent parseMessage(String message) {
+        TextComponent textComponent = new TextComponent();
+        StringBuilder currentText = new StringBuilder();
+        ChatColor currentColor = ChatColor.WHITE;
+
+        for (int i = 0; i < message.length(); i++) {
+            if (message.charAt(i) == '&' && i + 7 < message.length()) {
+                // Flush the current text with the current color
+                if (currentText.length() > 0) {
+                    TextComponent part = new TextComponent(currentText.toString());
+                    part.setColor(currentColor);
+                    textComponent.addExtra(part);
+                    currentText.setLength(0);
+                }
+
+                // Parse the new color
+                String colorCode = message.substring(i + 1, i + 7);
+                try {
+                    Color color = Color.decode("#" + colorCode);
+                    currentColor = ChatColor.of(color);
+                } catch (NumberFormatException e) {
+                    // Invalid color code, continue with the previous color
+                }
+                i += 6; // Skip the color code
+            } else {
+                currentText.append(message.charAt(i));
+            }
+        }
+
+        // Add the remaining text
+        if (currentText.length() > 0) {
+            TextComponent part = new TextComponent(currentText.toString());
+            part.setColor(currentColor);
+            textComponent.addExtra(part);
+        }
+
+        return textComponent;
     }
 }
