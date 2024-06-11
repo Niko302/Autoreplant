@@ -62,7 +62,6 @@ public final class Autoreplant extends JavaPlugin implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         // Check if the event was cancelled by another plugin
         if (event.isCancelled()) {
-//            getLogger().info("Block break event was cancelled by another plugin.");
             return;
         }
 
@@ -70,9 +69,6 @@ public final class Autoreplant extends JavaPlugin implements Listener {
         Block block = event.getBlock();
         Material blockType = block.getType();
         ItemStack tool = player.getInventory().getItemInMainHand();
-
-        // Add logging to check the player's tool
-//        getLogger().info("Player's tool: " + tool.toString());
 
         if (!isAutoreplantEnabled(player) || !player.hasPermission("autoreplant.use")) {
             return;
@@ -82,41 +78,36 @@ public final class Autoreplant extends JavaPlugin implements Listener {
         if (isCropBlock(block)) {
             // Check if the correct tool is used, or if the player has the ignore tool restrictions permission
             if (!configManager.getAllowedItems().contains(tool.getType()) && !player.hasPermission("autoreplant.ignoretoolrestrictions")) {
-                // If the wrong tool is used, let the block break naturally
-                // No need to cancel the event here
-                block.breakNaturally();
                 return;
             }
 
             // Check if the block is fully grown
             if (isFullyGrownCrop(block)) {
-                event.setCancelled(true);
-
                 // Capture the direction of the cocoa block before breaking it
-                BlockFace cocoaFace = null;
-                if (blockType == Material.COCOA) {
-                    cocoaFace = ((Directional) block.getBlockData()).getFacing();
-                }
+                final BlockFace cocoaFace = blockType == Material.COCOA ? ((Directional) block.getBlockData()).getFacing() : null;
+                final Material finalBlockType = blockType;
 
-                // Get the initial crop block data and reapply direction if it's cocoa
-                BlockData newBlockData = getInitialCropBlockData(blockType);
-                if (blockType == Material.COCOA && cocoaFace != null) {
-                    ((Directional) newBlockData).setFacing(cocoaFace);
-                }
+                // Schedule the replanting task
+                getServer().getScheduler().runTaskLater(this, () -> {
+                    // Get the initial crop block data and reapply direction if it's cocoa
+                    BlockData newBlockData = getInitialCropBlockData(finalBlockType);
+                    if (finalBlockType == Material.COCOA && cocoaFace != null) {
+                        ((Directional) newBlockData).setFacing(cocoaFace);
+                    }
 
-                block.setBlockData(newBlockData);
+                    block.setBlockData(newBlockData);
 
-                for (ItemStack drop : getCropDrops(blockType, tool, configManager.useFortune())) {
-                    block.getWorld().dropItem(block.getLocation(), drop);
-                }
-            } else {
-                // If the crop is not fully grown, cancel the event and restore the block to its original state
-                event.setCancelled(true);
-                block.getState().update(true, false);
+                    for (ItemStack drop : getCropDrops(finalBlockType, tool, configManager.useFortune())) {
+                        block.getWorld().dropItem(block.getLocation(), drop);
+                    }
+
+                    // Trigger a BlockBreakEvent for other plugins
+                    BlockBreakEvent replantEvent = new BlockBreakEvent(block, player);
+                    getServer().getPluginManager().callEvent(replantEvent);
+                }, 1L); // Run 1 tick later to ensure the block is set correctly
             }
         }
     }
-
 
 
     // Method to check if the block is a crop block
