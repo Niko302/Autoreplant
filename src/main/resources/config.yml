@@ -6,7 +6,7 @@ allowed-items:
   - DIAMOND_HOE
   - IRON_HOE
   - STONE_HOE
-  - GOLD_HOE
+  - GOLDEN_HOE
   - WOODEN_HOE
 
 messages:
