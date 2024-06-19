@@ -42,7 +42,6 @@ public final class Autoreplant extends JavaPlugin implements Listener {
 
         getLogger().info("Autoreplant has started successfully.");
 
-
         // Initialize the fortuneEnchantmentName field
         fortuneEnchantmentName = EnchantmentUtils.getFortuneEnchantmentName();
 
@@ -105,10 +104,11 @@ public final class Autoreplant extends JavaPlugin implements Listener {
                     BlockBreakEvent replantEvent = new BlockBreakEvent(block, player);
                     getServer().getPluginManager().callEvent(replantEvent);
                 }, 1L); // Run 1 tick later to ensure the block is set correctly
+            } else {
+                event.setCancelled(true); // Cancel the block break event if the crop is not fully grown
             }
         }
     }
-
 
     // Method to check if the block is a crop block
     private boolean isCropBlock(Block block) {
@@ -119,7 +119,6 @@ public final class Autoreplant extends JavaPlugin implements Listener {
                 block.getType() == Material.COCOA ||
                 block.getType() == Material.NETHER_WART;
     }
-
 
     public boolean isAutoreplantEnabled(Player player) {
         return enabledPlayers.contains(player.getUniqueId());
@@ -193,14 +192,11 @@ public final class Autoreplant extends JavaPlugin implements Listener {
     private List<ItemStack> getCropDrops(Material cropType, ItemStack tool, boolean useFortune) {
         List<ItemStack> drops = new ArrayList<>();
         int baseAmount = getBaseAmount(cropType);
-//        getLogger().info("Base Amount: " + baseAmount);
         int fortuneLevel = useFortune ? getFortuneLevel(tool) : 0; // Only consider Fortune if enabled in config
-//        getLogger().info("Fortune Level: " + fortuneLevel);
         int dropAmount = baseAmount;
 
         // Adjust drop amount based on Fortune level
         dropAmount += fortuneLevel;
-//        getLogger().info("Drop Amount: " + dropAmount);
 
         switch (cropType) {
             case WHEAT:
@@ -225,11 +221,8 @@ public final class Autoreplant extends JavaPlugin implements Listener {
                 break;
         }
 
-//        getLogger().info("Drops: " + drops.toString());
         return drops;
     }
-
-
 
     private int getBaseAmount(Material cropType) {
         // Define base drop amounts for different crop types
@@ -264,5 +257,4 @@ public final class Autoreplant extends JavaPlugin implements Listener {
         }
         return 0;
     }
-
 }
