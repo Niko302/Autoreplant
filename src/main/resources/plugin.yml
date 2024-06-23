@@ -1,8 +1,9 @@
-name: Autoreplant
-version: '${project.version}'
+name: AutoReplant
+version: ${project.version}
 description: Automatically replants crops when harvested with specific tools.
-main: me.niko302.autoreplant.Autoreplant
+main: me.niko302.autoreplant.AutoReplant
 api-version: '1.20'
+authors: [ Niko302, BitByLogic ]
 
 commands:
   autoreplant:
