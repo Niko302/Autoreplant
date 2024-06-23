@@ -1,15 +1,21 @@
 package me.niko302.autoreplant.config;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Getter
 public class ConfigManager {
 
+    @Getter(AccessLevel.NONE)
     private final JavaPlugin plugin;
+
+    @Getter(AccessLevel.NONE)
     private FileConfiguration config;
 
     private boolean useFortune; // Variable to store the use-fortune setting
@@ -37,28 +43,7 @@ public class ConfigManager {
     }
 
     public List<Material> getAllowedItems() {
-        List<Material> allowedItems = new ArrayList<>();
-        List<String> itemNames = config.getStringList("allowed-items");
-        for (String itemName : itemNames) {
-            try {
-                Material material = Material.valueOf(itemName);
-                allowedItems.add(material);
-            } catch (IllegalArgumentException e) {
-                plugin.getLogger().warning("Invalid material name '" + itemName + "' in config.yml");
-            }
-        }
-        return allowedItems;
+        return config.getStringList("allowed-items").stream().map(Material::valueOf).collect(Collectors.toList());
     }
 
-    public boolean useFortune() {
-        return useFortune;
-    }
-
-    public boolean isAutoreplantEnabled() {
-        return autoreplantEnabled;
-    }
-
-    public boolean getIgnoreToolRestrictions() {
-        return ignoreToolRestrictions;
-    }
 }

@@ -1,4 +1,7 @@
-# Autoreplant Plugin
+<div align="center">
+<img src="https://i.imgur.com/0fLrOFG.gif">
+<h1>Auto Replant</h1>
+</div>
 
 ## Overview
 
